@@ -1,9 +1,17 @@
 [tool.poetry]
 name = "btf_extractor"
-version = "0.1.0"
+version = "0.1.5b1"
 description = "Extract various BTF archive format."
 authors = ["2-propanol <nuclear.fusion.247@gmail.com>"]
+readme = "README.md"
+homepage = "https://github.com/2-propanol/btf_extractor"
 license = "zlib license"
+packages = [
+    { include = "btf_extractor"},
+]
+# exclude = [
+#     {path = "btf_extractor/c_ext"},
+# ]
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -15,9 +23,9 @@ black = "^20.8b1"
 ptpython = "^3.0.7"
 
 [tool.poetry.build]
-generate-setup-file = false
+generate-setup-file = true
 script = "build.py"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core>=1.0.0", "setuptools"]
 build-backend = "poetry.core.masonry.api"

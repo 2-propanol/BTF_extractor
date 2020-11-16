@@ -1,8 +1,10 @@
 """BTFDBBのzipファイルを展開せずに使用するためのライブラリ
+
 BTFDBB UBO2003(*)形式, ATRIUM(**)形式のzipファイルを参照し、
 ・zipファイルに含まれるファイルと角度情報の取得
 ・「角度のタプル(tl, pl, tv, pv)」から「画像の実体(ndarray形式)」を取得
 する関数を提供する
+
 (*) http://cg.cs.uni-bonn.de/en/projects/btfdbb/download/ubo2003/
 (**) http://cg.cs.uni-bonn.de/en/projects/btfdbb/download/atrium/
 """
@@ -16,7 +18,7 @@ from PIL import Image
 AnglesTuple = Tuple[int, int, int, int]
 
 
-class BtfFromZip:
+class Ubo2003:
     """BTFDBBのzipファイルから角度や画像を取り出す"""
 
     def __init__(self, zip_filepath: str) -> None:
