@@ -11,6 +11,7 @@ ext_modules = [
     Extension(
         "ubo2014_cpp",
         extra_compile_args=["-mavx", "-Ofast", "-march=native"],
+        # /DNOMINMAX /D_SCL_SECURE_NO_WARNINGS /D_CRT_SECURE_NO_WARNINGS
         sources=["btf_extractor/c_ext/ubo2014.cc"],
     )
 ]

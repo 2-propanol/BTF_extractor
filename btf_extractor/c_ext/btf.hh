@@ -120,8 +120,10 @@ struct BTF
     uint64_t LeftSingularUSize = 0,
              RightSingularSxVSize = 0;
 
+    Vector3 *Views = nullptr;
     Vector3 *Lights = nullptr;
 
+    uint32_t ViewCount = 0;
     uint32_t LightCount = 0;
 
     uint32_t *LightIndices = nullptr;
@@ -561,6 +563,7 @@ BTF *LoadBTF(const char *filename, BTFExtra *out_extra)
         uint32_t view_count;
         fs.read(reinterpret_cast<char *>(&view_count), sizeof(view_count));
         std::unique_ptr<Vector3[]> views(new Vector3[view_count]);
+        btf->ViewCount = view_count;
         std::unique_ptr<Vector3[]> lights;
 
         for (uint32_t view_idx = 0; view_idx < view_count; ++view_idx)
@@ -608,6 +611,7 @@ BTF *LoadBTF(const char *filename, BTFExtra *out_extra)
             }
         }
 
+        btf->Views = views.release();
         btf->Lights = lights.release();
 
         return true;

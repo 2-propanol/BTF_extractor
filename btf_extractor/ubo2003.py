@@ -25,13 +25,14 @@ class Ubo2003:
         """使用するzipファイルを指定する"""
         self.zip_filepath = zip_filepath
         self.z = ZipFile(zip_filepath)
-        self.filepath_set = self.get_filepath_set()
+        self.filepath_set = self.__get_filepath_set()
+        self.angles_set = self.__get_angles_set()
 
-    def get_filepath_set(self) -> Set[str]:
+    def __get_filepath_set(self) -> Set[str]:
         """zip内の"jpg"ファイルのファイルパスの集合を取得する"""
         return {path for path in self.z.namelist() if path.endswith(".jpg")}
 
-    def get_angles_set(self) -> Set[AnglesTuple]:
+    def __get_angles_set(self) -> Set[AnglesTuple]:
         """zip内の"jpg"ファイル名から角度情報を取得し、intのタプルの集合で返す"""
         return {self.filename_to_angles(path) for path in self.get_filepath_set()}
 

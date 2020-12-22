@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "btf_extractor"
-version = "0.1.5b1"
+version = "0.1.5b3"
 description = "Extract various BTF archive format."
 authors = ["2-propanol <nuclear.fusion.247@gmail.com>"]
 readme = "README.md"
