@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "btf_extractor"
-version = "0.1.5b3"
-description = "Extract various BTF archive format."
+version = "0.2.0b1"
+description = "Extract UBO BTF archive format(UBO2003, UBO2014)."
 authors = ["2-propanol <nuclear.fusion.247@gmail.com>"]
 readme = "README.md"
 homepage = "https://github.com/2-propanol/btf_extractor"
