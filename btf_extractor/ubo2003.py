@@ -41,7 +41,7 @@ class Ubo2003:
         >>> image = btf.angles_to_image(*angles_list[0])
         >>> print(image.shape)
         (256, 256, 3)
-        >>> print(angles_list[0]))
+        >>> print(angles_list[0])
         (0, 0, 0, 0)
     """
 

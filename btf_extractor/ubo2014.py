@@ -29,14 +29,14 @@ class Ubo2014:
             btfファイルに含まれる画像の角度条件の集合。
 
     Example:
-        >>> btf = Ubo2014("UBO_CORDUROY256.zip")
+        >>> btf = Ubo2014("carpet01_resampled_W400xH400_L151xV151.btf")
         >>> print(btf.img_shape)
         (400, 400, 3)
         >>> angles_list = list(btf.angles_set)
         >>> image = btf.angles_to_image(*angles_list[0])
         >>> print(image.shape)
         (400, 400, 3)
-        >>> print(angles_list[0]))
+        >>> print(angles_list[0])
         (60.0, 270.0, 60.0, 135.0)
     """
 
