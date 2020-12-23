@@ -28,6 +28,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <cmath>
 
 #include <assert.h>
 

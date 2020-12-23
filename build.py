@@ -3,18 +3,26 @@ from distutils.command.build_ext import build_ext
 from distutils.core import Extension
 from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
 
-os.environ["CC"] = "gcc"
-os.environ["CXX"] = "g++"
 
+if os.name == "nt":
+    ext_modules = [
+        Extension(
+            "ubo2014_cpp",
+            extra_compile_args=["/O2", "/arch:AVX", "/DNOMINMAX"],
+            sources=["btf_extractor/c_ext/ubo2014.cc"],
+        )
+    ]
+else:
+    os.environ["CC"] = "gcc"
+    os.environ["CXX"] = "g++"
 
-ext_modules = [
-    Extension(
-        "ubo2014_cpp",
-        extra_compile_args=["-mavx", "-Ofast", "-march=native"],
-        # /DNOMINMAX /D_SCL_SECURE_NO_WARNINGS /D_CRT_SECURE_NO_WARNINGS
-        sources=["btf_extractor/c_ext/ubo2014.cc"],
-    )
-]
+    ext_modules = [
+        Extension(
+            "ubo2014_cpp",
+            extra_compile_args=["-mavx", "-Ofast", "-march=native"],
+            sources=["btf_extractor/c_ext/ubo2014.cc"],
+        )
+    ]
 
 
 class BuildFailed(Exception):
