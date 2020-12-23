@@ -13,7 +13,7 @@ from typing import Tuple
 
 import numpy as np
 
-from ubo2014_cpp import FetchBTF, LoadBTF, SniffBTF
+from ubo2014_cpp import FetchBTF, FetchBTF_pixel, LoadBTF, SniffBTF
 
 
 class Ubo2014:
@@ -24,11 +24,14 @@ class Ubo2014:
 
     Attributes:
         btf_filepath (str): コンストラクタに指定したbtfファイルパス。
+        img_shape (tuple[int,int,int]): btfファイルに含まれている画像のshape。
         angles_set (set[tuple[float,float,float,float]]):
             btfファイルに含まれる画像の角度条件の集合。
 
     Example:
         >>> btf = Ubo2014("UBO_CORDUROY256.zip")
+        >>> print(btf.img_shape)
+        (400, 400, 3)
         >>> angles_list = list(btf.angles_set)
         >>> image = btf.angles_to_image(*angles_list[0])
         >>> print(image.shape)
@@ -43,7 +46,7 @@ class Ubo2014:
             raise (TypeError, "`btf_filepath` is not str")
         self.btf_filepath = btf_filepath
         self.__raw_btf = LoadBTF(btf_filepath)
-        self._view_vecs, self._light_vecs = SniffBTF(self.__raw_btf)
+        self._view_vecs, self._light_vecs, self.img_shape = SniffBTF(self.__raw_btf)
         self._light_vecs = np.array(self._light_vecs)
         self._view_vecs = np.array(self._view_vecs)
         self.light_set, self.view_set = self.__get_angles_set()
@@ -77,6 +80,8 @@ class Ubo2014:
 
     def index_to_image(self, light_idx: int, view_idx: int) -> np.ndarray:
         """`self.light_set`, `self.view_set`のインデックスで画像を指定し、ndarray形式で返す"""
+        if light_idx+1 > len(self.light_set) and view_idx > len(self.view_set):
+            raise IndexError(f"angle index out of range")
         img = np.array(FetchBTF(self.__raw_btf, light_idx, view_idx))
         return img[:, :, ::-1]
 
@@ -98,3 +103,14 @@ class Ubo2014:
             raise ValueError(f"tv:{tv}, pv:{pv} not found")
 
         return self.index_to_image(light_idx, view_idx)
+
+    def angles_xy_to_pixel(
+        self, light_idx: float, view_idx: float, x: int, y: int
+    ) -> np.ndarray:
+        """`tl`, `pl`, `tv`, `pv`の角度条件で`x`, `y`の座標の画素値をRGBのfloatで返す"""
+        if light_idx+1 > len(self.light_set) and view_idx > len(self.view_set):
+            raise IndexError(f"angle index out of range")
+        if x+1 > self.img_shape[0] and y > self.img_shape[1]:
+            raise IndexError(f"angle index out of range")
+        pixel = np.array(FetchBTF_pixel(self.__raw_btf, light_idx, view_idx, x, y))
+        return pixel

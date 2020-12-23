@@ -30,6 +30,7 @@ static PyObject *LoadBTF_py(PyObject *self, PyObject *args)
 static PyObject *SniffBTF_py(PyObject *self, PyObject *args)
 {
     PyObject *raw_btf = Py_None;
+    PyObject *img_shape = Py_None;
     PyObject *result = Py_None;
     BTF *btf = nullptr;
 
@@ -61,7 +62,10 @@ static PyObject *SniffBTF_py(PyObject *self, PyObject *args)
             }
 
             // TODO: int check
-            result = Py_BuildValue("(OO)", view_vecs, light_vecs);
+            img_shape = Py_BuildValue("(iii)", btf->Width, btf->Height, btf->ChannelCount);
+
+            // TODO: int check
+            result = Py_BuildValue("(OOO)", view_vecs, light_vecs, img_shape);
         } else {
             PyErr_SetString(PyExc_ValueError, "invalid pointer");
             return NULL;
@@ -112,6 +116,37 @@ static PyObject *FetchBTF_py(PyObject *self, PyObject *args)
     return result;
 }
 
+static PyObject *FetchBTF_pixel_py(PyObject *self, PyObject *args)
+{
+    PyObject *raw_btf = Py_None;
+    PyObject *result = Py_None;
+    BTF *btf = nullptr;
+    uint32_t light_idx, view_idx, x_idx, y_idx;
+
+    if (PyArg_ParseTuple(args, "Oiiii", &raw_btf, &light_idx, &view_idx, &x_idx, &y_idx))
+    {
+        if (PyCapsule_IsValid(raw_btf, NULL))
+        {
+            btf = (BTF *)(PyCapsule_GetPointer(raw_btf, NULL));
+        } else {
+            PyErr_SetString(PyExc_ValueError, "invalid PyCapsule");
+            return NULL;
+        }
+        if (btf)
+        {
+            // TODO: null check
+            auto spec = BTFFetchSpectrum(btf, light_idx, view_idx, x_idx, y_idx);
+
+            // TODO: int check
+            result = Py_BuildValue("(fff)", spec.x, spec.y, spec.z);
+        } else {
+            PyErr_SetString(PyExc_ValueError, "invalid pointer");
+            return NULL;
+        }
+    }
+    return result;
+}
+
 static PyMethodDef ubo2014_module_methods[] = {
     {"LoadBTF", (PyCFunction)LoadBTF_py, METH_VARARGS,
      PyDoc_STR(
@@ -124,7 +159,11 @@ static PyMethodDef ubo2014_module_methods[] = {
     {"FetchBTF", (PyCFunction)FetchBTF_py, METH_VARARGS,
      PyDoc_STR(
         "Args: PyCapsule, int, int\n"
-        "Return: tuple[list[list[tuple[float, float, float]]], tuple[float, float, float], tuple[float, float, float]")},
+        "Return: list[list[tuple[float, float, float]]]")},
+    {"FetchBTF_pixel", (PyCFunction)FetchBTF_pixel_py, METH_VARARGS,
+     PyDoc_STR(
+        "Args: PyCapsule, int, int, int, int\n"
+        "Return: tuple[float, float, float]")},
 
     // Sentinel
     {NULL, NULL, 0, NULL}};
