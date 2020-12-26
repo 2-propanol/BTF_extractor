@@ -434,6 +434,8 @@ void DestroyBTF(BTF *btf)
     btf->LeftSingularU = nullptr;
     delete[] btf->RightSingularSxV;
     btf->RightSingularSxV = nullptr;
+    delete[] btf->Views;
+    btf->Views = nullptr;
     delete[] btf->Lights;
     btf->Lights = nullptr;
     delete[] btf->Offsets;
