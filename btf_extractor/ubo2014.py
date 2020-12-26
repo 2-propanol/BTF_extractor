@@ -80,7 +80,7 @@ class Ubo2014:
 
     def index_to_image(self, light_idx: int, view_idx: int) -> np.ndarray:
         """`self.light_set`, `self.view_set`のインデックスで画像を指定し、ndarray形式で返す"""
-        if light_idx+1 > len(self.light_set) and view_idx > len(self.view_set):
+        if light_idx + 1 > len(self.light_set) and view_idx + 1 > len(self.view_set):
             raise IndexError(f"angle index out of range")
         img = np.array(FetchBTF(self.__raw_btf, light_idx, view_idx))
         return img[:, :, ::-1]
@@ -108,9 +108,9 @@ class Ubo2014:
         self, light_idx: float, view_idx: float, x: int, y: int
     ) -> np.ndarray:
         """`tl`, `pl`, `tv`, `pv`の角度条件で`x`, `y`の座標の画素値をRGBのfloatで返す"""
-        if light_idx+1 > len(self.light_set) and view_idx > len(self.view_set):
+        if light_idx + 1 > len(self.light_set) and view_idx + 1 > len(self.view_set):
             raise IndexError(f"angle index out of range")
-        if x+1 > self.img_shape[0] and y > self.img_shape[1]:
+        if x + 1 > self.img_shape[0] and y + 1 > self.img_shape[1]:
             raise IndexError(f"angle index out of range")
         pixel = np.array(FetchBTF_pixel(self.__raw_btf, light_idx, view_idx, x, y))
         return pixel
