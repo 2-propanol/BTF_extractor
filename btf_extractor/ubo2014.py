@@ -83,7 +83,7 @@ class Ubo2014:
         if light_idx + 1 > len(self.light_set) and view_idx + 1 > len(self.view_set):
             raise IndexError(f"angle index out of range")
         img = np.array(FetchBTF(self.__raw_btf, light_idx, view_idx))
-        return img[:, :, ::-1]
+        return img[:, :, ::-1].astype(np.float16)
 
     def angles_to_image(self, tl: float, pl: float, tv: float, pv: float) -> np.ndarray:
         """`tl`, `pl`, `tv`, `pv`の角度条件の画像をndarray形式で返す"""
@@ -113,7 +113,7 @@ class Ubo2014:
         if x + 1 > self.img_shape[0] and y + 1 > self.img_shape[1]:
             raise IndexError(f"angle index out of range")
         pixel = np.array(FetchBTF_pixel(self.__raw_btf, light_idx, view_idx, x, y))
-        return pixel
+        return pixel.astype(np.float16)
 
     def fetch_all_images(self) -> np.ndarray:
         """`self.angles_list`のindexに対応
@@ -124,7 +124,5 @@ class Ubo2014:
             (self._lights * self._views, *self.img_shape), dtype=np.float16
         )
         for i, (l, v) in enumerate(product(range(self._lights), range(self._views))):
-            all_img[i] = np.array(FetchBTF(self.btf_filepath, l, v))[:, :, ::-1].astype(
-                np.float16
-            )
-        return all_img
+            all_img[i] = np.array(FetchBTF(self.btf_filepath, l, v))[:, :, ::-1]
+        return all_img.astype(np.float16)
