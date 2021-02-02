@@ -97,6 +97,7 @@ static PyObject *FetchBTF_py(PyObject *self, PyObject *args) {
 
       // TODO: int check
       result = Py_BuildValue("O", nested_list);
+      Py_DECREF(nested_list);
     } else {
       PyErr_SetString(PyExc_ValueError, "invalid pointer");
       return NULL;
