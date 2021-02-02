@@ -114,3 +114,17 @@ class Ubo2014:
             raise IndexError(f"angle index out of range")
         pixel = np.array(FetchBTF_pixel(self.__raw_btf, light_idx, view_idx, x, y))
         return pixel
+
+    def fetch_all_images(self) -> np.ndarray:
+        """`self.angles_list`のindexに対応
+
+        151 lights * 151 views * 400 width * 400 height * 3 channel * 2byte = 21.9GB
+        """
+        all_img = np.empty(
+            (self._lights * self._views, *self.img_shape), dtype=np.float16
+        )
+        for i, (l, v) in enumerate(product(range(self._lights), range(self._views))):
+            all_img[i] = np.array(FetchBTF(self.btf_filepath, l, v))[:, :, ::-1].astype(
+                np.float16
+            )
+        return all_img
