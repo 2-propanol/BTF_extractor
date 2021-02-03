@@ -44,14 +44,14 @@ static PyObject *SniffBTF_py(PyObject *self, PyObject *args) {
 
       for (uint32_t view_idx = 0; view_idx < btf->ViewCount; ++view_idx) {
         auto view = btf->Views[view_idx];
-        PyList_SetItem(view_vecs, view_idx,
-                       Py_BuildValue("(fff)", view.x, view.y, view.z));
+        PyList_SET_ITEM(view_vecs, view_idx,
+                        Py_BuildValue("(fff)", view.x, view.y, view.z));
       }
 
       for (uint32_t light_idx = 0; light_idx < btf->ViewCount; ++light_idx) {
         auto light = btf->Lights[light_idx];
-        PyList_SetItem(light_vecs, light_idx,
-                       Py_BuildValue("(fff)", light.x, light.y, light.z));
+        PyList_SET_ITEM(light_vecs, light_idx,
+                        Py_BuildValue("(fff)", light.x, light.y, light.z));
       }
 
       // TODO: int check
@@ -89,10 +89,10 @@ static PyObject *FetchBTF_py(PyObject *self, PyObject *args) {
         PyObject *list = PyList_New(btf->Width);
         for (uint32_t btf_x = 0; btf_x < btf->Width; ++btf_x) {
           auto spec = BTFFetchSpectrum(btf, light_idx, view_idx, btf_x, btf_y);
-          PyList_SetItem(list, btf_x,
-                         Py_BuildValue("(fff)", spec.x, spec.y, spec.z));
+          PyList_SET_ITEM(list, btf_x,
+                          Py_BuildValue("(fff)", spec.x, spec.y, spec.z));
         }
-        PyList_SetItem(nested_list, btf_y, list);
+        PyList_SET_ITEM(nested_list, btf_y, list);
       }
 
       // TODO: int check
