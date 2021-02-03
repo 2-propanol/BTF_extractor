@@ -10,14 +10,15 @@ BTFDBB UBO2003(*)形式, ATRIUM(**)形式のzipファイルを参照し、
 (**) http://cg.cs.uni-bonn.de/en/projects/btfdbb/download/atrium/
 """
 from sys import stderr
-from typing import Set, Tuple
+from typing import Any, Set, Tuple
 from zipfile import ZipFile
 
 import numpy as np
+from nptyping import NDArray
 from PIL import Image
 
 AnglesTuple = Tuple[int, int, int, int]
-
+BGRImage = NDArray[(Any, Any, 3), np.uint8]
 
 class Ubo2003:
     """BTFDBBのzipファイルから角度や画像を取り出す
@@ -70,7 +71,7 @@ class Ubo2003:
         pv = int(filename[-7:-4])
         return (tl, pl, tv, pv)
 
-    def _filename_to_image(self, filename: str) -> np.ndarray:
+    def _filename_to_image(self, filename: str) -> BGRImage:
         """`filename`が含まれるファイルを探し、その画像をndarray形式で返す
 
         `filename`が含まれるファイルが存在しない場合は`ValueError`
@@ -93,7 +94,7 @@ class Ubo2003:
         img = Image.open(self.__z.open(filepaths[0]))
         return np.array(img)[:, :, ::-1]
 
-    def angles_to_image(self, tl: int, pl: int, tv: int, pv: int) -> np.ndarray:
+    def angles_to_image(self, tl: int, pl: int, tv: int, pv: int) -> BGRImage:
         """`tl`, `pl`, `tv`, `pv`の角度条件の画像をndarray形式で返す"""
         filename = f"tl{tl:03} pl{pl:03} tv{tv:03} pv{pv:03}.jpg"
         return self._filename_to_image(filename)
