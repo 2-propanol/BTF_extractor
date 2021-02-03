@@ -1,28 +1,26 @@
-import os
+import platform
 from distutils.command.build_ext import build_ext
 from distutils.core import Extension
 from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
 
 
-if os.name == "nt":
-    ext_modules = [
-        Extension(
-            "ubo2014_cpp",
-            extra_compile_args=["/O2", "/arch:AVX", "/DNOMINMAX"],
-            sources=["btf_extractor/c_ext/ubo2014.cc"],
-        )
-    ]
-else:
-    os.environ["CC"] = "gcc"
-    os.environ["CXX"] = "g++"
+compile_args = []
 
-    ext_modules = [
-        Extension(
-            "ubo2014_cpp",
-            extra_compile_args=["-mavx", "-Ofast", "-march=native"],
-            sources=["btf_extractor/c_ext/ubo2014.cc"],
-        )
-    ]
+pf = platform.system()
+if pf == "Windows":
+    compile_args = ["/std:c++14", "/DNOMINMAX", "/O2"]
+elif pf == "Darwin":
+    compile_args = ["-std=c++14", "-O2", "-march=native"]
+elif pf == "Linux":
+    compile_args = ["-std=c++14", "-Ofast", "-march=native"]
+
+ext_modules = [
+    Extension(
+        "ubo2014_cpp",
+        extra_compile_args=compile_args,
+        sources=["btf_extractor/c_ext/ubo2014.cc"],
+    )
+]
 
 
 class BuildFailed(Exception):
