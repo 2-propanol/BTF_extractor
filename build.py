@@ -8,10 +8,13 @@ compile_args = []
 
 pf = platform.system()
 if pf == "Windows":
+    # for MSVC
     compile_args = ["/std:c++14", "/DNOMINMAX", "/O2"]
 elif pf == "Darwin":
+    # for clang
     compile_args = ["-std=c++14", "-O2", "-march=native"]
 elif pf == "Linux":
+    # for gcc
     compile_args = ["-std=c++14", "-Ofast", "-march=native"]
 
 ext_modules = [

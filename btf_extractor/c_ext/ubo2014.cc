@@ -3,36 +3,36 @@
 
 #include "btf.hh"
 
-static void FreeBTF_py(PyObject *raw_btf) {
-  DestroyBTF((BTF *)PyCapsule_GetPointer(raw_btf, NULL));
+static void FreeBTF_py(PyObject *capsuled_btf) {
+  DestroyBTF((BTF *)PyCapsule_GetPointer(capsuled_btf, NULL));
 }
 
 static PyObject *LoadBTF_py(PyObject *self, PyObject *args) {
-  PyObject *raw_btf = Py_None;
+  PyObject *capsuled_btf = Py_None;
   char *filename;
 
   if (PyArg_ParseTuple(args, "s", &filename)) {
     auto *btf = LoadBTF((char *)filename);
     if (btf) {
-      raw_btf = PyCapsule_New(btf, NULL, FreeBTF_py);
-      // raw_btf = PyCapsule_New(btf, filename, FreeBTF_py);
+      capsuled_btf = PyCapsule_New(btf, NULL, FreeBTF_py);
+      // capsuled_btf = PyCapsule_New(btf, filename, FreeBTF_py);
     } else {
-      PyErr_SetString(PyExc_RuntimeError, "cannot read file");
+      PyErr_SetString(PyExc_RuntimeError, "could not read file");
       return NULL;
     }
   }
-  return raw_btf;
+  return capsuled_btf;
 }
 
 static PyObject *SniffBTF_py(PyObject *self, PyObject *args) {
-  PyObject *raw_btf = Py_None;
+  PyObject *capsuled_btf = Py_None;
   PyObject *img_shape = Py_None;
   PyObject *result = Py_None;
   BTF *btf = nullptr;
 
-  if (PyArg_ParseTuple(args, "O", &raw_btf)) {
-    if (PyCapsule_IsValid(raw_btf, NULL)) {
-      btf = (BTF *)(PyCapsule_GetPointer(raw_btf, NULL));
+  if (PyArg_ParseTuple(args, "O", &capsuled_btf)) {
+    if (PyCapsule_IsValid(capsuled_btf, NULL)) {
+      btf = (BTF *)(PyCapsule_GetPointer(capsuled_btf, NULL));
     } else {
       PyErr_SetString(PyExc_ValueError, "invalid PyCapsule");
       return NULL;
@@ -60,6 +60,9 @@ static PyObject *SniffBTF_py(PyObject *self, PyObject *args) {
 
       // TODO: int check
       result = Py_BuildValue("(OOO)", view_vecs, light_vecs, img_shape);
+      Py_DECREF(view_vecs);
+      Py_DECREF(light_vecs);
+      Py_DECREF(img_shape);
     } else {
       PyErr_SetString(PyExc_ValueError, "invalid pointer");
       return NULL;
@@ -69,33 +72,33 @@ static PyObject *SniffBTF_py(PyObject *self, PyObject *args) {
 }
 
 static PyObject *FetchBTF_py(PyObject *self, PyObject *args) {
-  PyObject *raw_btf = Py_None;
+  PyObject *capsuled_btf = Py_None;
   PyObject *result = Py_None;
   BTF *btf = nullptr;
   uint32_t light_idx, view_idx;
 
-  if (PyArg_ParseTuple(args, "Oii", &raw_btf, &light_idx, &view_idx)) {
-    if (PyCapsule_IsValid(raw_btf, NULL)) {
-      btf = (BTF *)(PyCapsule_GetPointer(raw_btf, NULL));
+  if (PyArg_ParseTuple(args, "Oii", &capsuled_btf, &light_idx, &view_idx)) {
+    if (PyCapsule_IsValid(capsuled_btf, NULL)) {
+      btf = (BTF *)(PyCapsule_GetPointer(capsuled_btf, NULL));
     } else {
       PyErr_SetString(PyExc_ValueError, "invalid PyCapsule");
       return NULL;
     }
     if (btf) {
       // TODO: null check
-      PyObject *list = PyList_New(btf->Height*btf->Width*3);
+      PyObject *img1d = PyList_New(btf->Height * btf->Width * 3);
       for (uint32_t btf_y = 0; btf_y < btf->Height; ++btf_y) {
         for (uint32_t btf_x = 0; btf_x < btf->Width; ++btf_x) {
           auto spec = BTFFetchSpectrum(btf, light_idx, view_idx, btf_x, btf_y);
-          uint32_t btf_xy = (btf_x + btf_y*btf->Width)*3;
-          PyList_SET_ITEM(list, btf_xy  , Py_BuildValue("f", spec.x));
-          PyList_SET_ITEM(list, btf_xy+1, Py_BuildValue("f", spec.y));
-          PyList_SET_ITEM(list, btf_xy+2, Py_BuildValue("f", spec.z));
+          uint32_t btf_xy = (btf_x + btf_y * btf->Width) * 3;
+          PyList_SET_ITEM(img1d, btf_xy, Py_BuildValue("f", spec.x));
+          PyList_SET_ITEM(img1d, btf_xy + 1, Py_BuildValue("f", spec.y));
+          PyList_SET_ITEM(img1d, btf_xy + 2, Py_BuildValue("f", spec.z));
         }
       }
 
-      result = Py_BuildValue("O", list);
-      Py_DECREF(list);
+      result = Py_BuildValue("O", img1d);
+      Py_DECREF(img1d);
     } else {
       PyErr_SetString(PyExc_ValueError, "invalid pointer");
       return NULL;
@@ -105,15 +108,15 @@ static PyObject *FetchBTF_py(PyObject *self, PyObject *args) {
 }
 
 static PyObject *FetchBTF_pixel_py(PyObject *self, PyObject *args) {
-  PyObject *raw_btf = Py_None;
+  PyObject *capsuled_btf = Py_None;
   PyObject *result = Py_None;
   BTF *btf = nullptr;
   uint32_t light_idx, view_idx, x_idx, y_idx;
 
-  if (PyArg_ParseTuple(args, "Oiiii", &raw_btf, &light_idx, &view_idx, &x_idx,
-                       &y_idx)) {
-    if (PyCapsule_IsValid(raw_btf, NULL)) {
-      btf = (BTF *)(PyCapsule_GetPointer(raw_btf, NULL));
+  if (PyArg_ParseTuple(args, "Oiiii", &capsuled_btf, &light_idx, &view_idx,
+                       &x_idx, &y_idx)) {
+    if (PyCapsule_IsValid(capsuled_btf, NULL)) {
+      btf = (BTF *)(PyCapsule_GetPointer(capsuled_btf, NULL));
     } else {
       PyErr_SetString(PyExc_ValueError, "invalid PyCapsule");
       return NULL;
@@ -138,8 +141,8 @@ static PyMethodDef ubo2014_module_methods[] = {
                "Return: PyCapsule")},
     {"SniffBTF", (PyCFunction)SniffBTF_py, METH_VARARGS,
      PyDoc_STR("Args: PyCapsule\n"
-               "Return: list[tuple[float, float, float]], list[tuple[float, "
-               "float, float]]")},
+               "Return: list[tuple[float, float, float]],"
+               "list[tuple[float, float, float]]")},
     {"FetchBTF", (PyCFunction)FetchBTF_py, METH_VARARGS,
      PyDoc_STR("Args: PyCapsule, int, int\n"
                "Return: list[list[tuple[float, float, float]]]")},

@@ -103,16 +103,20 @@ class Ubo2014:
         phi = np.rad2deg(np.arctan2(y, x)) % 360  # -180から+180を、0から360に収める
         return theta, phi
 
-    def _index_to_image(self, light_idx: int, view_idx: int) -> BGRImage:
+    def _index_to_image_skip_validation(
+        self, light_idx: int, view_idx: int
+    ) -> BGRImage:
         """`index_to_image()` インデックスチェック無し"""
-        return np.array(FetchBTF(self.__raw_btf, light_idx, view_idx), dtype=np.float16).reshape(self.img_shape)[..., ::-1]
+        return np.array(
+            FetchBTF(self.__raw_btf, light_idx, view_idx), dtype=np.float16
+        ).reshape(self.img_shape)[..., ::-1]
 
     def index_to_image(self, light_idx: int, view_idx: int) -> BGRImage:
         """`self._*s_in_spherical`のインデックスで画像を指定し、ndarray形式で返す"""
         if light_idx >= self.num_lights and view_idx >= self.num_views:
             raise IndexError(f"angle index out of range")
 
-        return self._index_to_image(light_idx, view_idx)
+        return self._index_to_image_skip_validation(light_idx, view_idx)
 
     def light_angles_to_index(self, theta_phi: NDArray[(2), np.float16]):
         """`self.lights_in_spherical`から`theta_phi`が格納されているindexを探索する"""
@@ -130,7 +134,7 @@ class Ubo2014:
         if light_idx.size == 0 or view_idx.size == 0:
             raise ValueError(f"tl:{tl}, pl:{pl}, tv:{tv}, pv:{pv} not found")
 
-        return self._index_to_image(light_idx[0], view_idx[0])
+        return self._index_to_image_skip_validation(light_idx[0], view_idx[0])
 
     def angles_xy_to_pixel(
         self, light_idx: float, view_idx: float, x: int, y: int
