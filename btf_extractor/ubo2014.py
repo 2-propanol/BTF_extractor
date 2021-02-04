@@ -105,8 +105,7 @@ class Ubo2014:
 
     def _index_to_image(self, light_idx: int, view_idx: int) -> BGRImage:
         """`index_to_image()` インデックスチェック無し"""
-        img = np.array(FetchBTF(self.__raw_btf, light_idx, view_idx))
-        return img[:, :, ::-1].astype(np.float16)
+        return np.array(FetchBTF(self.__raw_btf, light_idx, view_idx), dtype=np.float16).reshape(self.img_shape)[..., ::-1]
 
     def index_to_image(self, light_idx: int, view_idx: int) -> BGRImage:
         """`self._*s_in_spherical`のインデックスで画像を指定し、ndarray形式で返す"""
