@@ -97,8 +97,7 @@ static PyObject *FetchBTF_py(PyObject *self, PyObject *args) {
         }
       }
 
-      result = Py_BuildValue("O", img1d);
-      Py_DECREF(img1d);
+      result = img1d;
     } else {
       PyErr_SetString(PyExc_ValueError, "invalid pointer");
       return NULL;
