@@ -1,4 +1,8 @@
 # BTF Extractor
+[![PyPI version](https://img.shields.io/pypi/v/btf-extractor?style=flat-square)](https://pypi.org/project/btf-extractor/#history)
+[![GitHub version](https://img.shields.io/github/v/tag/2-propanol/BTF_extractor?style=flat-square)](https://github.com/2-propanol/BTF_extractor/releases)
+[![Python Versions](https://img.shields.io/pypi/pyversions/btf-extractor?style=flat-square)](https://pypi.org/project/btf-extractor/)
+
 Extract UBO BTF archive format([UBO2003](https://cg.cs.uni-bonn.de/en/projects/btfdbb/download/ubo2003/), [UBO2014](https://cg.cs.uni-bonn.de/en/projects/btfdbb/download/ubo2014/)).
 
 This repository uses [zeroeffects/btf](https://github.com/zeroeffects/btf)'s [btf.hh](https://github.com/zeroeffects/btf/blob/master/btf.hh).
@@ -7,8 +11,8 @@ Extract to ndarray compatible with openCV(BGR, channels-last).
 
 
 ## Build tested on
-- Windows 10 20H2 + MSVC v14.20
-- MacOS 11(Big Sur) + Homebrew GCC 10.2.0
+- Windows 10 20H2 + MSVC v14.28
+- MacOS 11(Big Sur) + clang 12.0.0
 - Ubuntu 20.04 + GCC 9.3.0
 
 ## Install
