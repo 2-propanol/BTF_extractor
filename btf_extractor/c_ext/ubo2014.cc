@@ -83,21 +83,19 @@ static PyObject *FetchBTF_py(PyObject *self, PyObject *args) {
     }
     if (btf) {
       // TODO: null check
-      PyObject *nested_list = PyList_New(btf->Height);
-
+      PyObject *list = PyList_New(btf->Height*btf->Width*3);
       for (uint32_t btf_y = 0; btf_y < btf->Height; ++btf_y) {
-        PyObject *list = PyList_New(btf->Width);
         for (uint32_t btf_x = 0; btf_x < btf->Width; ++btf_x) {
           auto spec = BTFFetchSpectrum(btf, light_idx, view_idx, btf_x, btf_y);
-          PyList_SET_ITEM(list, btf_x,
-                          Py_BuildValue("(fff)", spec.x, spec.y, spec.z));
+          uint32_t btf_xy = (btf_x + btf_y*btf->Width)*3;
+          PyList_SET_ITEM(list, btf_xy  , Py_BuildValue("f", spec.x));
+          PyList_SET_ITEM(list, btf_xy+1, Py_BuildValue("f", spec.y));
+          PyList_SET_ITEM(list, btf_xy+2, Py_BuildValue("f", spec.z));
         }
-        PyList_SET_ITEM(nested_list, btf_y, list);
       }
 
-      // TODO: int check
-      result = Py_BuildValue("O", nested_list);
-      Py_DECREF(nested_list);
+      result = Py_BuildValue("O", list);
+      Py_DECREF(list);
     } else {
       PyErr_SetString(PyExc_ValueError, "invalid pointer");
       return NULL;
