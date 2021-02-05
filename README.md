@@ -9,16 +9,18 @@ This repository uses [zeroeffects/btf](https://github.com/zeroeffects/btf)'s [bt
 
 Extract to ndarray compatible with openCV(BGR, channels-last).
 
-
-## Build tested on
-- Windows 10 20H2 + MSVC v14.28
-- MacOS 11(Big Sur) + clang 12.0.0
-- Ubuntu 20.04 + GCC 9.3.0
-
 ## Install
 ```bash
 pip install btf-extractor
 ```
+
+This package uses the [Python C API](https://docs.python.org/3/c-api/index.html).
+To install this package, a C++ build environment is required.
+
+### Build is tested on
+- Windows 10 20H2 + MSVC v14.28 ([Build Tools for Visual Studio 2019](https://visualstudio.microsoft.com/downloads/))
+- MacOS 11(Big Sur) + clang 12.0.0 (Command line tools for Xcode (`xcode-select --install`))
+- Ubuntu 20.04 + GCC 9.3.0 ([build-essential](https://packages.ubuntu.com/focal/build-essential))
 
 ## Example
 ```python
@@ -42,3 +44,21 @@ pip install btf-extractor
 >>> print(angles_list[0])
 (60.0, 270.0, 60.0, 135.0)
 ```
+
+## Supported Datasets
+### UBO2003
+6561 images, 256x256 resolution, 81 view and 81 light directions. 
+
+![ubo2003](https://user-images.githubusercontent.com/42978570/107014489-02f65c80-67df-11eb-9efc-b0e33670f311.jpg)
+> Mirko Sattler, Ralf Sarlette and Reinhard Klein "[Efficient and Realistic Visualization of Cloth](http://cg.cs.uni-bonn.de/de/publikationen/paper-details/sattler-2003-efficient/)", EGSR 2003.
+
+### ATRIUM (non-HDR)
+6561 images, 800x800 resolution, 81 view and 81 light directions.
+
+![atrium](https://user-images.githubusercontent.com/42978570/107017968-32a76380-67e3-11eb-9e87-a14708182f80.jpg)
+
+### UBO2014
+22,801 images, 512x512(400x400) resolution, 151 view and 151 light directions.
+
+![ubo2014](https://user-images.githubusercontent.com/42978570/107017983-376c1780-67e3-11eb-8416-047b648f64ca.jpg)
+> [Michael Weinmann](https://cg.cs.uni-bonn.de/en/people/dr-michael-weinmann/), [Juergen Gall](http://www.iai.uni-bonn.de/~gall/) and [Reinhard Klein](https://cg.cs.uni-bonn.de/en/people/prof-dr-reinhard-klein/). "[Material Classification based on Training Data Synthesized Using a BTF Database](https://cg.cs.uni-bonn.de/de/publikationen/paper-details/weinmann-2014-materialclassification/)", accepted at ECCV 2014.
