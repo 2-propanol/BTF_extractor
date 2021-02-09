@@ -10,14 +10,13 @@ BTFDBB UBO2003(*)形式, ATRIUM(**)形式のzipファイルを参照し、
 (**) http://cg.cs.uni-bonn.de/en/projects/btfdbb/download/atrium/
 """
 from collections import Counter
-from functools import lru_cache
 from sys import stderr
 from typing import Any, Tuple
 from zipfile import ZipFile
 
 import numpy as np
 from nptyping import NDArray
-from PIL import Image
+from simplejpeg import decode_jpeg
 
 AnglesTuple = Tuple[int, int, int, int]
 BGRImage = NDArray[(Any, Any, 3), np.uint8]
@@ -100,4 +99,5 @@ class Ubo2003:
                 f"Condition {key} does not exist in '{self.zip_filepath}'."
             )
 
-        return np.array(Image.open(self.__z.open(filepath)))[:, :, ::-1]
+        with self.__z.open(filepath) as f:
+            return decode_jpeg(f.read(), colorspace="BGR")
