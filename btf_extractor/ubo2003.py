@@ -88,15 +88,6 @@ class Ubo2003:
         pv = int(filename[-7:-4])
         return (tl, pl, tv, pv)
 
-    @lru_cache(maxsize=6561)
-    def __filepath_to_image(self, filepath: str) -> BGRImage:
-        """zipファイルから`filepath`の画像を読み込み、ndarray形式で返す。
-        
-        `filepath`が正しいかどうかチェックしないため、事前に確認が必要。
-        """
-        # 実在する画像にのみLRUキャッシュを適用するため、この部分だけ関数として分離
-        return np.array(Image.open(self.__z.open(filepath)))[:, :, ::-1]
-
     def angles_to_image(self, tl: int, pl: int, tv: int, pv: int) -> BGRImage:
         """`tl`, `pl`, `tv`, `pv`の角度条件の画像をndarray形式で返す
 
@@ -109,4 +100,4 @@ class Ubo2003:
                 f"Condition {key} does not exist in '{self.zip_filepath}'."
             )
 
-        return self.__filepath_to_image(filepath)
+        return np.array(Image.open(self.__z.open(filepath)))[:, :, ::-1]
