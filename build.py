@@ -1,8 +1,9 @@
 import platform
-from distutils.command.build_ext import build_ext
 from distutils.core import Extension
 from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
 
+import numpy
+from Cython.Distutils import build_ext
 
 compile_args = []
 
@@ -19,12 +20,14 @@ elif pf == "Linux":
 
 ext_modules = [
     Extension(
-        "ubo2014_cpp",
+        "ubo2014_cy",
+        sources=["btf_extractor/ubo2014.pyx"],
+        include_dirs=[numpy.get_include(), "btf_extractor/c_ext"],
+        define_macros=[("BTF_IMPLEMENTATION", "1")],
         extra_compile_args=compile_args,
-        sources=["btf_extractor/c_ext/ubo2014.cc"],
+        language='c++'
     )
 ]
-
 
 class BuildFailed(Exception):
     pass

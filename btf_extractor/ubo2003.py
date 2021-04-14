@@ -21,6 +21,7 @@ from simplejpeg import decode_jpeg
 
 AnglesTuple = Tuple[int, int, int, int]
 BGRImage = NDArray[(Any, Any, 3), np.uint8]
+BGRImageHDR = NDArray[(Any, Any, 3), np.float32]
 
 
 class Ubo2003:
@@ -42,11 +43,13 @@ class Ubo2003:
     Example:
         >>> btf = Ubo2003("UBO_CORDUROY256.zip")
         >>> angles_list = list(btf.angles_set)
+        >>> print(angles_list[0])
+        (0, 0, 0, 0)
         >>> image = btf.angles_to_image(*angles_list[0])
         >>> print(image.shape)
         (256, 256, 3)
-        >>> print(angles_list[0])
-        (0, 0, 0, 0)
+        >>> print(image.dtype)
+        uint8
     """
 
     def __init__(self, zip_filepath: str) -> None:
@@ -121,13 +124,15 @@ class AtriumHdr:
         angles_set (set[tuple[int,int,int,int]]): zipファイルに含まれる画像の角度条件の集合。
 
     Example:
-        >>> btf = Atrium("CEILING_HDR.zip")
+        >>> btf = AtriumHdr("CEILING_HDR.zip")
         >>> angles_list = list(btf.angles_set)
+        >>> print(angles_list[0])
+        (0, 0, 0, 0)
         >>> image = btf.angles_to_image(*angles_list[0])
         >>> print(image.shape)
         (256, 256, 3)
-        >>> print(angles_list[0])
-        (0, 0, 0, 0)
+        >>> print(image.dtype)
+        float32
     """
 
     FIXED_HEADER = "-Y 256 +X 256".encode()
@@ -171,7 +176,7 @@ class AtriumHdr:
         pv = int(filename[-7:-4])
         return (tl, pl, tv, pv)
 
-    def angles_to_image(self, tl: int, pl: int, tv: int, pv: int) -> BGRImage:
+    def angles_to_image(self, tl: int, pl: int, tv: int, pv: int) -> BGRImageHDR:
         """`tl`, `pl`, `tv`, `pv`の角度条件の画像をndarray形式で返す
 
         `filename`が含まれるファイルが存在しない場合は`ValueError`を投げる。
