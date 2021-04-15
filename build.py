@@ -23,11 +23,12 @@ ext_modules = [
         "ubo2014_cy",
         sources=["btf_extractor/ubo2014.pyx"],
         include_dirs=[numpy.get_include(), "btf_extractor/c_ext"],
-        define_macros=[("BTF_IMPLEMENTATION", "1")],
+        define_macros=[("BTF_IMPLEMENTATION", "1"), ("NPY_NO_DEPRECATED_API", "1")],
         extra_compile_args=compile_args,
-        language='c++'
+        language="c++",
     )
 ]
+
 
 class BuildFailed(Exception):
     pass
