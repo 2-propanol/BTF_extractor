@@ -56,7 +56,7 @@ float32
 >>> print(image.shape)
 (400, 400, 3)
 >>> print(image.dtype)
-float16
+float32
 ```
 
 ## Supported Datasets

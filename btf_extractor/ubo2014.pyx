@@ -38,11 +38,11 @@ cdef class Ubo2014:
         >>> print(image.dtype)
         float32
     """
-    cdef public str btf_filepath
+    cdef readonly str btf_filepath
     cdef BTF* __raw_btf
-    cdef public tuple img_shape
-    cdef public frozenset angles_set
-    cdef dict __angles_vs_index_dict
+    cdef readonly tuple img_shape
+    cdef readonly frozenset angles_set
+    cdef readonly dict angles_vs_index_dict
 
     def __cinit__(self, btf_filepath: str) -> None:
         """使用するbtfファイルを指定する"""
@@ -61,16 +61,6 @@ cdef class Ubo2014:
         cdef Py_ssize_t num_lights = self.__raw_btf.LightCount
 
         # *_in_cartesian: 直交座標系で格納された角度情報
-        cdef np.ndarray[DTYPE_F32_t, ndim=2] _views_in_cartesian = np.empty(
-            (num_views, 3), dtype=DTYPE_F32
-        )
-        cdef Vector3 view
-        for view_idx in range(num_views):
-            view = self.__raw_btf.Views[view_idx]
-            _views_in_cartesian[view_idx,0] = view.x
-            _views_in_cartesian[view_idx,1] = view.y
-            _views_in_cartesian[view_idx,2] = view.z
-
         cdef np.ndarray[DTYPE_F32_t, ndim=2] _lights_in_cartesian = np.empty(
             (num_lights, 3), dtype=DTYPE_F32
         )
@@ -81,39 +71,30 @@ cdef class Ubo2014:
             _lights_in_cartesian[light_idx,1] = light.y
             _lights_in_cartesian[light_idx,2] = light.z
 
+        cdef np.ndarray[DTYPE_F32_t, ndim=2] _views_in_cartesian = np.empty(
+            (num_views, 3), dtype=DTYPE_F32
+        )
+        cdef Vector3 view
+        for view_idx in range(num_views):
+            view = self.__raw_btf.Views[view_idx]
+            _views_in_cartesian[view_idx,0] = view.x
+            _views_in_cartesian[view_idx,1] = view.y
+            _views_in_cartesian[view_idx,2] = view.z
+
         # *_in_spherical: 球面座標系で格納された角度情報
         cdef np.ndarray[DTYPE_F32_t, ndim=2] lights_in_spherical = np.empty(
             (num_lights, 3), dtype=DTYPE_F32
         )
-        cdef np.ndarray[DTYPE_F32_t, ndim=2] views_in_spherical = np.empty(
-            (num_views, 3), dtype=DTYPE_F32
-        )
         lights_in_spherical = self._cartesian_to_spherical(
             _lights_in_cartesian
+        )
+
+        cdef np.ndarray[DTYPE_F32_t, ndim=2] views_in_spherical = np.empty(
+            (num_views, 3), dtype=DTYPE_F32
         )
         views_in_spherical = self._cartesian_to_spherical(
             _views_in_cartesian
         )
-
-        # cdef np.ndarray[DTYPE_F32_t, ndim=2] _views_in_spherical = np.empty((self.__raw_btf.ViewCount, 2), dtype=DTYPE_F32)
-        # cdef Vector3 view
-        # for view_idx in range(self.__raw_btf.ViewCount):
-        #     view = self.__raw_btf.Views[view_idx]
-        #     _views_in_spherical[view_idx,0] = acos(view.z)  #tv
-        #     _views_in_spherical[view_idx,1] = atan2(view.y, view.x) % 360  #pv
-        # self.num_views = len(_views_in_spherical)
-
-        # cdef np.ndarray[DTYPE_F32_t, ndim=2] _lights_in_spherical = np.empty((self.__raw_btf.LightCount, 2), dtype=DTYPE_F32)
-        # cdef Vector3 light
-        # for view_idx in range(self.__raw_btf.LightCount):
-        #     view = self.__raw_btf.Views[view_idx]
-        #     _lights_in_spherical[view_idx,0] = acos(light.z)  #tl
-        #     _lights_in_spherical[view_idx,1] = atan2(light.y, light.x) % 360  #pl
-        # self.num_lights = len(_lights_in_spherical)
-
-        # UBO2014の角度情報の精度は0.5度単位なので小数点以下1桁に丸める
-        # self.lights_in_spherical = self.lights_in_spherical.round(1)
-        # self.views_in_spherical = self.views_in_spherical.round(1)
 
         cdef list angles_list
         angles_list = [
@@ -122,7 +103,7 @@ cdef class Ubo2014:
         ]
 
         # このBTFファイルに含まれる(tl, pl, tv, pv)の組からindexを引く辞書
-        self.__angles_vs_index_dict = {
+        self.angles_vs_index_dict = {
             angles: (lidx, vidx)
             for angles, (lidx, vidx)
             in zip(angles_list, product(range(num_lights), range(num_views)))
@@ -141,6 +122,7 @@ cdef class Ubo2014:
         self, np.ndarray[DTYPE_F32_t, ndim=2] xyz
     ):
         """直交座標系から球面座標系に変換する"""
+        # UBO2014の角度情報の精度は0.5度単位なので小数点以下1桁に丸める
         cdef np.ndarray[DTYPE_F32_t, ndim=1] theta
         cdef np.ndarray[DTYPE_F32_t, ndim=1] phi
         theta = np.rad2deg(np.arccos(xyz[:,2]))
@@ -165,29 +147,55 @@ cdef class Ubo2014:
         for y in range(height):
             for x in range(width):
                 spec = BTFFetchSpectrum(self.__raw_btf, lidx, vidx, x, y)
-                img3d_view[y,x,0] = spec.x
+                img3d_view[y,x,0] = spec.z
                 img3d_view[y,x,1] = spec.y
-                img3d_view[y,x,2] = spec.z
+                img3d_view[y,x,2] = spec.x
         return img3d
 
     def angles_to_image(self, tl: float, pl: float, tv: float, pv: float):
         """`tl`, `pl`, `tv`, `pv`の角度条件の画像をndarray形式で返す"""
         cdef tuple key = (tl, pl, tv, pv)
-        cdef tuple indices = self.__angles_vs_index_dict.get(key)
+        cdef tuple indices = self.angles_vs_index_dict.get(key)
         if not indices:
             raise ValueError(
                 f"Condition {key} does not exist in '{self.btf_filepath}'."
             )
         return self._index_to_image_skip_validation(indices[0], indices[1])
 
-    # def angles_xy_to_pixel(
-    #     self, light_idx: float, view_idx: float, x: int, y: int
-    # ) -> NDArray[(2), np.float16]:
-    #     """`tl`, `pl`, `tv`, `pv`の角度条件の`x`, `y`の座標の画素値をRGBのfloatで返す"""
-    #     if light_idx >= self.num_lights and view_idx >= self.num_views:
-    #         raise IndexError(f"angle index out of range")
-    #     if x >= self.img_shape[0] and y >= self.img_shape[1]:
-    #         raise IndexError(f"xy index out of range")
+    @cython.nonecheck(False)
+    def _angleindex_to_image_unsafe(
+        self, light_idx: int, view_idx: int
+    ):
+        """`light_idx`, `view_idx`で指定される角度条件の画像をndarray形式で返す
 
-    #     pixel = np.array(FetchBTF_pixel(self.__raw_btf, light_idx, view_idx, x, y))
-    #     return pixel.astype(np.float16)
+        `light_idx`, `view_idx`で指定される角度条件の、(`x`, `y`)座標の画素値をRGBのfloatで返す
+
+        値(引数)の妥当性をチェックしない。不正な値を入力するとクラッシュする。
+        """
+        return self._index_to_image_skip_validation(light_idx, view_idx)
+
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    @cython.nonecheck(False)
+    cdef np.ndarray[DTYPE_F32_t, ndim=1] _index_xy_to_image_skip_validation(
+        self, int light_idx, int view_idx, int x, int y
+    ):
+        cdef Spectrum spec
+        cdef np.ndarray[DTYPE_F32_t, ndim=1] rgb = np.empty(
+            (3), dtype=DTYPE_F32
+        )
+        spec = BTFFetchSpectrum(self.__raw_btf, light_idx, view_idx, x, y)
+        rgb[0] = spec.x
+        rgb[1] = spec.y
+        rgb[2] = spec.z
+        return rgb
+
+    @cython.nonecheck(False)
+    def _angleindex_xy_to_image_unsafe(
+        self, light_idx: int, view_idx: int, x: int, y: int
+    ):
+        """画素単位アクセス
+
+        値(引数)の妥当性をチェックしない。不正な値を入力するとクラッシュする。
+        """
+        return self._index_xy_to_image_skip_validation(light_idx, view_idx, x, y)
