@@ -1,3 +1,6 @@
+setup.py
+btf_extractor/*.cpp
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
