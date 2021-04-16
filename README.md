@@ -14,7 +14,7 @@ Extract to ndarray compatible with openCV(BGR, channels-last).
 pip install btf-extractor
 ```
 
-This package uses the [Python C API](https://docs.python.org/3/c-api/index.html).
+This package uses the [Cython](https://cython.readthedocs.io/en/latest/src/quickstart/install.html).
 To install this package, a C++ build environment is required.
 
 ### Build is tested on
