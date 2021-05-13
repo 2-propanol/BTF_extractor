@@ -2,6 +2,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/btf-extractor?style=flat-square)](https://pypi.org/project/btf-extractor/#history)
 [![GitHub version](https://img.shields.io/github/v/tag/2-propanol/BTF_extractor?style=flat-square)](https://github.com/2-propanol/BTF_extractor/releases)
 [![Python Versions](https://img.shields.io/pypi/pyversions/btf-extractor?style=flat-square)](https://pypi.org/project/btf-extractor/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-black?style=flat-square)](https://github.com/psf/black)
 
 Extract UBO BTF archive format([UBO2003](https://cg.cs.uni-bonn.de/en/projects/btfdbb/download/ubo2003/), [ATRIUM](https://cg.cs.uni-bonn.de/en/projects/btfdbb/download/atrium/), [UBO2014](https://cg.cs.uni-bonn.de/en/projects/btfdbb/download/ubo2014/)).
 
