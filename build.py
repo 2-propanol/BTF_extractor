@@ -13,7 +13,8 @@ if pf == "Windows":
     compile_args = ["/std:c++14", "/DNOMINMAX", "/O2", "/openmp"]
 elif pf == "Darwin":
     # for clang
-    compile_args = ["-std=c++14", "-O2", "-march=native", "-fopenmp"]
+    compile_args = ["-std=c++14", "-O2", "-march=native", "-Xpreprocessor", "-fopenmp"]
+    link_args = ["-lomp"]
 elif pf == "Linux":
     # for gcc
     compile_args = ["-std=c++14", "-Ofast", "-march=native", "-fopenmp"]

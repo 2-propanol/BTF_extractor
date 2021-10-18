@@ -16,11 +16,11 @@ pip install btf-extractor
 ```
 
 This package uses the [Cython](https://cython.readthedocs.io/en/latest/src/quickstart/install.html).
-To install this package, a C++ build environment is required.
+To install this package, a C++ and OpenMP build environment is required.
 
 ### Build is tested on
 - Windows 10 20H2 + MSVC v14.28 ([Build Tools for Visual Studio 2019](https://visualstudio.microsoft.com/downloads/))
-- MacOS 11(Big Sur) + clang 12.0.0 (Command line tools for Xcode (`xcode-select --install`))
+- MacOS 11(Big Sur) + clang 13.0.0 (`xcode-select --install`) + libomp (`brew install libomp`)
 - Ubuntu 20.04 + GCC 9.3.0 ([build-essential](https://packages.ubuntu.com/focal/build-essential))
 
 ## Example
@@ -62,7 +62,7 @@ float32
 
 ## Supported Datasets
 ### UBO2003
-6561 images, 256x256 resolution, 81 view and 81 light directions. 
+6561 images, 256x256 resolution, 81 view and 81 light directions.
 
 ![ubo2003](https://user-images.githubusercontent.com/42978570/114306638-59518580-9b17-11eb-9961-baa775ab235f.jpg)
 > Mirko Sattler, Ralf Sarlette and Reinhard Klein "[Efficient and Realistic Visualization of Cloth](http://cg.cs.uni-bonn.de/de/publikationen/paper-details/sattler-2003-efficient/)", EGSR 2003.

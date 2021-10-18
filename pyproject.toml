@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "btf_extractor"
-version = "1.6.0b2"
+version = "1.6.0"
 description = "Extract UBO BTF archive format(UBO2003, ATRIUM, UBO2014)."
 authors = ["2-propanol <nuclear.fusion.247@gmail.com>"]
 readme = "README.md"
@@ -12,7 +12,7 @@ packages = [
 exclude = [
     {path = "btf_extractor/ubo2014.cpp"},
 ]
- 
+
 [tool.poetry.dependencies]
 python = "^3.6"
 numpy = "^1.19"
