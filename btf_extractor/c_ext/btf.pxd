@@ -1,6 +1,6 @@
 ctypedef unsigned int uint32_t
 
-cdef extern from "btf.hh":
+cdef extern from "btf.hh" nogil:
     struct Vector3:
         float x, y, z
 

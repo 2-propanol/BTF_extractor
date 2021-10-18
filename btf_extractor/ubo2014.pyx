@@ -5,6 +5,7 @@ from typing import Any, Tuple
 cimport cython
 import numpy as np
 cimport numpy as np
+from cython.parallel import parallel, prange
 
 from btf cimport BTF, Spectrum, Vector3
 from btf cimport BTFFetchSpectrum, DestroyBTF, LoadBTF
@@ -137,22 +138,26 @@ cdef class Ubo2014:
     ):
         cdef Py_ssize_t height = self.__raw_btf.Height
         cdef Py_ssize_t width = self.__raw_btf.Width
-        cdef Py_ssize_t lidx = light_idx
-        cdef Py_ssize_t vidx = view_idx
+        cdef int lidx = light_idx
+        cdef int vidx = view_idx
         cdef Spectrum spec
         cdef np.ndarray[DTYPE_F32_t, ndim=3] img3d = np.empty(
             (height, width, 3), dtype=DTYPE_F32
         )
         cdef float[:, :, ::1] img3d_view = img3d
-        for y in range(height):
-            for x in range(width):
-                spec = BTFFetchSpectrum(self.__raw_btf, lidx, vidx, x, y)
-                img3d_view[y,x,0] = spec.z
-                img3d_view[y,x,1] = spec.y
-                img3d_view[y,x,2] = spec.x
+        cdef int x, y
+        with nogil, parallel():
+            for y in prange(height, schedule="dynamic"):
+                for x in range(width):
+                    spec = BTFFetchSpectrum(self.__raw_btf, lidx, vidx, x, y)
+                    img3d_view[y,x,0] = spec.z
+                    img3d_view[y,x,1] = spec.y
+                    img3d_view[y,x,2] = spec.x
         return img3d
-
-    def angles_to_image(self, tl: float, pl: float, tv: float, pv: float):
+    
+    def angles_to_image(
+        self, tl: float, pl: float, tv: float, pv: float
+    ) -> np.ndarray:
         """`tl`, `pl`, `tv`, `pv`の角度条件の画像をndarray形式で返す"""
         cdef tuple key = (tl, pl, tv, pv)
         cdef tuple indices = self.angles_vs_index_dict.get(key)
@@ -165,7 +170,7 @@ cdef class Ubo2014:
     @cython.nonecheck(False)
     def _angleindex_to_image_unsafe(
         self, light_idx: int, view_idx: int
-    ):
+    ) -> np.ndarray:
         """`light_idx`, `view_idx`で指定される角度条件の画像をndarray形式で返す
 
         `light_idx`, `view_idx`で指定される角度条件の、(`x`, `y`)座標の画素値をRGBのfloatで返す
@@ -193,7 +198,7 @@ cdef class Ubo2014:
     @cython.nonecheck(False)
     def _angleindex_xy_to_image_unsafe(
         self, light_idx: int, view_idx: int, x: int, y: int
-    ):
+    ) -> np.ndarray:
         """画素単位アクセス
 
         値(引数)の妥当性をチェックしない。不正な値を入力するとクラッシュする。
