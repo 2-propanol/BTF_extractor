@@ -7,8 +7,8 @@ import numpy as np
 cimport numpy as np
 from cython.parallel import parallel, prange
 
-from btf cimport BTF, Spectrum, Vector3
-from btf cimport BTFFetchSpectrum, DestroyBTF, LoadBTF
+from btf_extractor.c_ext.btf cimport BTF, Spectrum, Vector3
+from btf_extractor.c_ext.btf cimport BTFFetchSpectrum, DestroyBTF, LoadBTF
 
 DTYPE_F32 = np.float32
 ctypedef np.float32_t DTYPE_F32_t
