@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "btf_extractor"
-version = "1.6.0"
+version = "1.7.0"
 description = "Extract UBO BTF archive format(UBO2003, ATRIUM, UBO2014)."
 authors = ["2-propanol <nuclear.fusion.247@gmail.com>"]
 readme = "README.md"
